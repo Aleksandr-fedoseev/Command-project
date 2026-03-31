@@ -46,9 +46,9 @@
 
       <!-- БЛОК 2: ПРОМО -->
       <div class="card form-section">
+        <!-- Убрано предупреждение про обрезку -->
         <div class="section-head">
           <h3>2. Промо-материалы</h3>
-          <p style="color: #DC2626; font-size: 0.85rem; margin-top: 4px;">Внимание! Изображения должны быть строго указанного формата. Обрезка на сайте недоступна.</p>
         </div>
 
         <div class="media-grid">
@@ -71,12 +71,13 @@
       <div class="card form-section">
         <div class="section-head"><h3>3. Тестирование и Билд</h3></div>
 
+        <!-- Светлый вариант Dev-среды -->
         <div class="dev-env-box">
-          <div style="display:flex; align-items:center; gap:8px; font-size:1.1rem; margin-bottom:8px;"><MonitorPlay class="icon-sm" /> <strong>Dev-среда</strong></div>
-          <p style="font-size:0.85rem; color:#9CA3AF; margin-bottom:16px;">Используйте эти данные для входа в игру:</p>
-          <div style="display:flex; gap:24px;">
-            <div class="cred-item"><span>Логин:</span> <code>welwise</code></div>
-            <div class="cred-item"><span>Пароль:</span> <code>1txqmYkZ-R</code></div>
+          <div class="dev-header"><MonitorPlay class="icon-sm text-primary" /> <strong>Dev-среда</strong></div>
+          <p class="text-sm text-muted mb-16">Используйте эти данные для входа в игру:</p>
+          <div class="credentials-row">
+            <div class="cred-item"><span class="text-muted">Логин:</span> <code class="code-val">welwise</code></div>
+            <div class="cred-item"><span class="text-muted">Пароль:</span> <code class="code-val">1txqmYkZ-R</code></div>
           </div>
         </div>
 
@@ -140,10 +141,16 @@ const buildMethod = ref('upload')
 .horizontal, .video { grid-column: span 2; aspect-ratio: 16/9; }
 .vertical { grid-row: span 2; }
 
-.dev-env-box { background: #111827; color: white; border-radius: var(--radius-md); padding: 20px; }
-.cred-item { background: #374151; padding: 8px 16px; border-radius: 6px; font-size: 0.9rem;}
-.cred-item span { color: #9CA3AF; margin-right: 8px; }
-.cred-item code { font-family: monospace; font-weight: 600; color: #60A5FA; }
+/* ОБНОВЛЕННАЯ СВЕТЛАЯ DEV-СРЕДА */
+.dev-env-box { background: #F9FAFB; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
+.dev-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 1.1rem; }
+.text-primary { color: var(--primary); }
+.text-muted { color: var(--text-muted); }
+.text-sm { font-size: 0.85rem; }
+.mb-16 { margin-bottom: 16px; margin-top: 0; }
+.credentials-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.cred-item { background: white; border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;}
+.code-val { font-family: monospace; font-weight: 600; color: var(--text-main); background: #F3F4F6; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.5px;}
 
 .build-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;}
 .method-card { border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px; font-weight: 600; cursor: pointer; background: #F9FAFB; transition: 0.2s;}
