@@ -1,23 +1,29 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import DashboardView from '../views/DashboardView.vue'
-import RequestsView from '../views/RequestsView.vue'
-import RequestDetailView from '../views/RequestDetailView.vue'
-import ReportsView from '../views/ReportsView.vue'
-import ProjectsView from '../views/ProjectsView.vue'
-import ServersView from '../views/ServersView.vue'
+import ProjectsList from '../views/ProjectsList.vue'
+import ProjectWorkspace from '../views/ProjectWorkspace.vue'
+import DraftTab from '../views/tabs/DraftTab.vue'
+import StatsTab from '../views/tabs/StatsTab.vue'
+import PublishedTab from '../views/tabs/PublishedTab.vue'
+import ServersTab from '../views/tabs/ServersTab.vue'
 
 const routes = [
-    { path: '/', name: 'dashboard', component: DashboardView },
-    { path: '/requests', name: 'requests', component: RequestsView },
-    { path: '/requests/:id', name: 'request-detail', component: RequestDetailView },
-    { path: '/reports', name: 'reports', component: ReportsView },
-    { path: '/projects', name: 'projects', component: ProjectsView },
-    { path: '/servers', name: 'servers', component: ServersView },
+    { path: '/', redirect: '/projects' },
+    { path: '/projects', component: ProjectsList },
+    {
+        path: '/projects/:id',
+        component: ProjectWorkspace,
+        props: true,
+        children: [
+            { path: '', redirect: to => `/projects/${to.params.id}/draft` },
+            { path: 'draft', name: 'draft', component: DraftTab },
+            { path: 'stats', name: 'stats', component: StatsTab },
+            { path: 'published', name: 'published', component: PublishedTab },
+            { path: 'servers', name: 'servers', component: ServersTab }
+        ]
+    }
 ]
 
-const router = createRouter({
+export default createRouter({
     history: createWebHistory(),
-    routes,
+    routes
 })
-
-export default router

@@ -1,84 +1,59 @@
 <template>
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="logo">🎮 Moderation UI</div>
+  <div class="app-layout">
+    <transition name="toast-fade">
+      <div v-if="toast.show" class="toast" :class="toast.type">{{ toast.message }}</div>
+    </transition>
 
-      <nav class="menu">
-        <router-link to="/" class="menu-item">Дашборд</router-link>
-        <router-link to="/requests" class="menu-item">Заявки</router-link>
-        <router-link to="/reports" class="menu-item">Жалобы</router-link>
+    <GlobalHeader />
 
-        <div class="divider"></div>
-
-        <router-link to="/projects" class="menu-item">Проекты</router-link>
-        <router-link to="/servers" class="menu-item">Серверы</router-link>
-      </nav>
-    </aside>
-
-    <main class="content">
-      <router-view />
+    <main class="page-content">
+      <div v-if="user.role === 'Модератор' && $route.path.includes('/projects')" class="moderator-stub">
+        <h2>Режим модератора</h2>
+        <p>Перейдите во вкладку "Очередь тикетов". Просмотр проектов недоступен.</p>
+      </div>
+      <router-view v-else />
     </main>
   </div>
 </template>
 
+<script setup>
+import GlobalHeader from './components/GlobalHeader.vue'
+import { toast, user } from './store'
+</script>
+
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f7fa;
+/* ВОЗВРАЩАЕМ КРАСИВЫЙ ДИЗАЙН */
+:root {
+  --bg-app: #F3F4F6;
+  --bg-card: #FFFFFF;
+  --text-main: #111827;
+  --text-muted: #6B7280;
+  --border: #E5E7EB;
+  --primary: #2563EB;
+  --primary-hover: #1D4ED8;
+  --radius-lg: 12px;
+  --radius-md: 8px;
 }
+body { margin: 0; background: var(--bg-app); color: var(--text-main); font-family: 'Inter', sans-serif; }
+a { text-decoration: none; }
+.app-layout { display: flex; flex-direction: column; min-height: 100vh; }
+.page-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-#app {
-  min-height: 100vh;
-}
+/* Общие элементы UI */
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; }
+.btn-primary { display: flex; align-items: center; gap: 8px; background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: 0.2s;}
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-outline { display: flex; align-items: center; gap: 8px; background: white; border: 1px solid var(--border); padding: 8px 16px; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: 0.2s;}
+.btn-outline:hover { background: #F9FAFB; }
+.icon-sm { width: 18px; height: 18px; }
+.icon-md { width: 24px; height: 24px; }
 
-.layout {
-  display: flex;
-  min-height: 100vh;
-}
+/* Уведомления */
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: var(--radius-md); font-weight: 600; color: white; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
+.toast.success { background: #10B981; } .toast.error { background: #EF4444; } .toast.info { background: #3B82F6; }
+.toast-fade-enter-active, .toast-fade-leave-active { transition: all 0.3s; }
+.toast-fade-enter-from, .toast-fade-leave-to { opacity: 0; transform: translate(-50%, -20px); }
 
-.sidebar {
-  width: 240px;
-  background: #001529;
-  color: white;
-  padding: 20px 0;
-}
-
-.logo {
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 30px;
-}
-
-.menu {
-  display: flex;
-  flex-direction: column;
-}
-
-.menu-item {
-  color: white;
-  text-decoration: none;
-  padding: 14px 24px;
-  transition: 0.2s;
-}
-
-.menu-item:hover {
-  background: #1890ff;
-}
-
-.router-link-active {
-  background: #1890ff;
-}
-
-.divider {
-  height: 1px;
-  background: rgba(255,255,255,0.2);
-  margin: 10px 0;
-}
-
-.content {
-  flex: 1;
-  padding: 24px;
-}
+.moderator-stub { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center; color: #6B7280;}
+.moderator-stub h2 { color: #8B5CF6; font-size: 2rem; margin-bottom: 8px;}
 </style>
