@@ -9,7 +9,8 @@
           <a href="#" class="nav-item text-muted"><Server class="icon-sm" /> Сервера</a>
         </template>
         <template v-if="user.role === 'Модератор'">
-          <a href="#" class="nav-item active"><Inbox class="icon-sm" /> Очередь тикетов</a>
+          <router-link to="/moderator/tickets" class="nav-item" active-class="active"><Inbox class="icon-sm" /> Очередь тикетов</router-link>
+          <router-link to="/moderator/roles" class="nav-item" active-class="active"><Users class="icon-sm" /> Управление ролями</router-link>
         </template>
       </nav>
     </div>
@@ -25,7 +26,6 @@
         </div>
         <div class="dropdown-body">
           <div class="dropdown-item" style="cursor: default; padding-bottom: 0;">
-            <!-- Убрал текст "Текущая роль (для демо)" -->
             <select v-model="user.role" style="width:100%; padding:8px; border-radius:6px; border:1px solid #E5E7EB; cursor:pointer; outline:none; font-weight:600; background:#F9FAFB;">
               <option value="Разработчик">Роль: Разработчик</option>
               <option value="Модератор">Роль: Модератор</option>
@@ -43,11 +43,12 @@
 <script setup>
 import { ref } from 'vue'
 import { user } from '../store'
-import { Layers, FolderGit2, Server, User, Inbox, Settings, LogOut } from 'lucide-vue-next'
+import { Layers, FolderGit2, Server, User, Inbox, Settings, LogOut, Users } from 'lucide-vue-next'
 const menuOpen = ref(false)
 </script>
 
 <style scoped>
+/* стили остаются без изменений */
 .top-header { height: 60px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 24px; position: sticky; top: 0; z-index: 50; }
 .header-left, .header-right { display: flex; align-items: center; gap: 32px; }
 .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.1rem; color: var(--text-main); }

@@ -5,6 +5,9 @@ import DraftTab from '../views/tabs/DraftTab.vue'
 import StatsTab from '../views/tabs/StatsTab.vue'
 import PublishedTab from '../views/tabs/PublishedTab.vue'
 import ServersTab from '../views/tabs/ServersTab.vue'
+import ModeratorTickets from '../views/ModeratorTickets.vue'
+import ModeratorRoles from '../views/ModeratorRoles.vue'
+import TicketDetail from '../views/TicketDetail.vue'
 
 const routes = [
     { path: '/', redirect: '/projects' },
@@ -20,7 +23,10 @@ const routes = [
             { path: 'published', name: 'published', component: PublishedTab },
             { path: 'servers', name: 'servers', component: ServersTab }
         ]
-    }
+    },
+    { path: '/moderator/tickets', component: ModeratorTickets },
+    { path: '/moderator/tickets/:id', component: TicketDetail },
+    { path: '/moderator/roles', component: ModeratorRoles }
 ]
 
 export default createRouter({
