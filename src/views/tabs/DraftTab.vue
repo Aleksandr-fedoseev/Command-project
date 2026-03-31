@@ -44,25 +44,48 @@
         </div>
       </div>
 
+      <!-- СКРЫТЫЕ ИНПУТЫ ДЛЯ МЕДИА И БИЛДОВ -->
+      <input type="file" ref="fileIcon" accept="image/png" hidden @change="handleFile('icon', $event)" />
+      <input type="file" ref="fileCoverMain" accept="image/png" hidden @change="handleFile('coverMain', $event)" />
+      <input type="file" ref="fileCoverVert" accept="image/png" hidden @change="handleFile('coverVert', $event)" />
+      <input type="file" ref="fileVideo" accept="video/mp4" hidden @change="handleFile('video', $event)" />
+      <input type="file" ref="fileZip" accept=".zip,.tar.gz" hidden @change="handleZipUpload" />
+
       <!-- БЛОК 2: ПРОМО -->
       <div class="card form-section">
-        <!-- Убрано предупреждение про обрезку -->
-        <div class="section-head">
-          <h3>2. Промо-материалы</h3>
-        </div>
+        <div class="section-head"><h3>2. Промо-материалы</h3></div>
 
         <div class="media-grid">
-          <div class="media-box square">
-            <ImageIcon class="icon-md" /><span class="m-title">Иконка</span><span class="m-req">512 x 512, png</span>
+          <!-- Иконка -->
+          <div class="media-box square" :class="{ uploaded: media.icon }" @click="$refs.fileIcon.click()">
+            <CheckCircle v-if="media.icon" class="icon-md text-green" />
+            <ImageIcon v-else class="icon-md" />
+            <span class="m-title">{{ media.icon ? 'Загружено' : 'Иконка' }}</span>
+            <span class="m-req">512 x 512, png</span>
           </div>
-          <div class="media-box horizontal">
-            <ImageIcon class="icon-md" /><span class="m-title">Главная обложка</span><span class="m-req">1280 x 720, png</span>
+
+          <!-- Главная обложка -->
+          <div class="media-box horizontal" :class="{ uploaded: media.coverMain }" @click="$refs.fileCoverMain.click()">
+            <CheckCircle v-if="media.coverMain" class="icon-md text-green" />
+            <ImageIcon v-else class="icon-md" />
+            <span class="m-title">{{ media.coverMain ? 'Загружено' : 'Главная обложка' }}</span>
+            <span class="m-req">1280 x 720, png</span>
           </div>
-          <div class="media-box vertical">
-            <ImageIcon class="icon-md" /><span class="m-title">Вертикальная</span><span class="m-req">650 x 820, png</span>
+
+          <!-- Вертикальная обложка -->
+          <div class="media-box vertical" :class="{ uploaded: media.coverVert }" @click="$refs.fileCoverVert.click()">
+            <CheckCircle v-if="media.coverVert" class="icon-md text-green" />
+            <ImageIcon v-else class="icon-md" />
+            <span class="m-title">{{ media.coverVert ? 'Загружено' : 'Вертикальная' }}</span>
+            <span class="m-req">650 x 820, png</span>
           </div>
-          <div class="media-box video">
-            <Film class="icon-md" /><span class="m-title">Видео</span><span class="m-req">До 12 МБ, без звука</span>
+
+          <!-- Видео -->
+          <div class="media-box video" :class="{ uploaded: media.video }" @click="$refs.fileVideo.click()">
+            <CheckCircle v-if="media.video" class="icon-md text-green" />
+            <Film v-else class="icon-md" />
+            <span class="m-title">{{ media.video ? 'Загружено' : 'Видео' }}</span>
+            <span class="m-req">До 12 МБ, без звука</span>
           </div>
         </div>
       </div>
@@ -71,7 +94,6 @@
       <div class="card form-section">
         <div class="section-head"><h3>3. Тестирование и Билд</h3></div>
 
-        <!-- Светлый вариант Dev-среды -->
         <div class="dev-env-box">
           <div class="dev-header"><MonitorPlay class="icon-sm text-primary" /> <strong>Dev-среда</strong></div>
           <p class="text-sm text-muted mb-16">Используйте эти данные для входа в игру:</p>
@@ -92,11 +114,37 @@
           </label>
         </div>
 
-        <div v-if="buildMethod === 'upload'" class="dropzone">
-          <UploadCloud style="width:32px; height:32px; color:#6B7280; margin-bottom:8px;" />
-          <span style="display:block; font-weight:600;">Нажмите для загрузки .zip архива</span>
+        <!-- РУЧНАЯ ЗАГРУЗКА БИЛДА (С ПРОГРЕСС-БАРОМ) -->
+        <div v-if="buildMethod === 'upload'" style="margin-top: 16px;">
+
+          <!-- Ожидание загрузки -->
+          <div v-if="buildStatus === 'idle'" class="dropzone" @click="$refs.fileZip.click()">
+            <UploadCloud style="width:32px; height:32px; color:#6B7280; margin-bottom:8px;" />
+            <span style="display:block; font-weight:600;">Нажмите для загрузки .zip архива</span>
+          </div>
+
+          <!-- Идет загрузка -->
+          <div v-if="buildStatus === 'uploading'" class="upload-progress-box">
+            <div class="prog-info">
+              <span style="font-weight: 600; color: var(--text-main);">Загрузка и распаковка архива...</span>
+              <span style="font-weight: 600; color: var(--primary);">{{ buildProgress }}%</span>
+            </div>
+            <div class="prog-bg">
+              <div class="prog-fill" :style="{ width: buildProgress + '%' }"></div>
+            </div>
+          </div>
+
+          <!-- Загрузка завершена -->
+          <div v-if="buildStatus === 'done'" class="upload-success-box">
+            <CheckCircle class="icon-md text-green" />
+            <div>
+              <span style="display:block; font-weight:600;">Билд успешно загружен и развернут!</span>
+              <button class="btn-text mt-8" @click="buildStatus = 'idle'">Загрузить новую версию</button>
+            </div>
+          </div>
         </div>
 
+        <!-- GITHUB -->
         <div v-if="buildMethod === 'github'" style="margin-top: 16px;">
           <label style="font-size:0.85rem; font-weight:600;">Ваш ник на GitHub:</label>
           <div style="display:flex; margin-top:8px;">
@@ -111,9 +159,58 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Rocket, Image as ImageIcon, Film, MonitorPlay, UploadCloud, Github } from 'lucide-vue-next'
+import { Rocket, Image as ImageIcon, Film, MonitorPlay, UploadCloud, Github, CheckCircle } from 'lucide-vue-next'
 import { showToast } from '../../store'
+
 const buildMethod = ref('upload')
+
+// СОСТОЯНИЕ МЕДИА
+const media = ref({
+  icon: false,
+  coverMain: false,
+  coverVert: false,
+  video: false
+})
+
+const handleFile = (type, event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  showToast('Файл загружается...', 'info')
+
+  // Имитация загрузки файла на сервер (задержка 1 сек)
+  setTimeout(() => {
+    media.value[type] = true
+    showToast('Медиафайл успешно сохранен', 'success')
+  }, 1000)
+}
+
+// СОСТОЯНИЕ БИЛДА
+const buildStatus = ref('idle') // idle | uploading | done
+const buildProgress = ref(0)
+
+const handleZipUpload = (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  buildStatus.value = 'uploading'
+  buildProgress.value = 0
+
+  // Имитация загрузки и распаковки
+  const interval = setInterval(() => {
+    buildProgress.value += Math.floor(Math.random() * 15) + 5 // Случайный шаг
+    if (buildProgress.value >= 100) {
+      buildProgress.value = 100
+      clearInterval(interval)
+
+      // Небольшая задержка перед показом успешного экрана
+      setTimeout(() => {
+        buildStatus.value = 'done'
+        showToast('Билд развернут в Dev-среде!', 'success')
+      }, 500)
+    }
+  }, 300)
+}
 </script>
 
 <style scoped>
@@ -131,17 +228,22 @@ const buildMethod = ref('upload')
 .req { color: #DC2626; }
 .char-count { font-weight: 400; color: var(--text-muted); }
 .input-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: #F9FAFB; font-family: inherit; box-sizing: border-box; resize: vertical; }
+.input-control:focus { outline: none; border-color: var(--primary); background: white; }
 
+/* МЕДИА СЕТКА И АКТИВНЫЕ СОСТОЯНИЯ */
 .media-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-.media-box { border: 1px dashed var(--border); border-radius: var(--radius-md); background: #F9FAFB; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); text-align: center; cursor: pointer; padding: 16px; }
+.media-box { border: 1px dashed var(--border); border-radius: var(--radius-md); background: #F9FAFB; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); text-align: center; cursor: pointer; padding: 16px; transition: 0.2s;}
 .media-box:hover { border-color: var(--primary); background: #EFF6FF; color: var(--primary); }
+.media-box.uploaded { border: 1px solid #10B981; background: #ECFDF5; color: #059669; }
+.text-green { color: #10B981; }
 .m-title { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
+.media-box.uploaded .m-title { color: #059669; }
 .m-req { font-size: 0.7rem; }
 .square { aspect-ratio: 1; }
 .horizontal, .video { grid-column: span 2; aspect-ratio: 16/9; }
 .vertical { grid-row: span 2; }
 
-/* ОБНОВЛЕННАЯ СВЕТЛАЯ DEV-СРЕДА */
+/* DEV СРЕДА */
 .dev-env-box { background: #F9FAFB; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
 .dev-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 1.1rem; }
 .text-primary { color: var(--primary); }
@@ -156,6 +258,14 @@ const buildMethod = ref('upload')
 .method-card { border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 12px; font-weight: 600; cursor: pointer; background: #F9FAFB; transition: 0.2s;}
 .method-radio input:checked + .method-card { border-color: var(--primary); background: #EFF6FF; color: var(--primary); }
 
-.dropzone { border: 2px dashed #D1D5DB; border-radius: var(--radius-md); padding: 32px; text-align: center; cursor: pointer; background: #F9FAFB; }
-.dropzone:hover { border-color: var(--primary); }
+/* РУЧНАЯ ЗАГРУЗКА БИЛДА */
+.dropzone { border: 2px dashed #D1D5DB; border-radius: var(--radius-md); padding: 32px; text-align: center; cursor: pointer; background: #F9FAFB; transition: 0.2s;}
+.dropzone:hover { border-color: var(--primary); background: #EFF6FF;}
+.upload-progress-box, .upload-success-box { padding: 24px; border: 1px solid var(--border); border-radius: var(--radius-md); background: #F9FAFB; }
+.prog-info { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; }
+.prog-bg { background: #E5E7EB; height: 8px; border-radius: 4px; overflow: hidden; }
+.prog-fill { background: var(--primary); height: 100%; transition: width 0.3s ease; }
+.upload-success-box { display: flex; align-items: center; gap: 16px; border-color: #10B981; background: #ECFDF5; }
+.btn-text { background: none; border: none; color: var(--primary); font-weight: 600; cursor: pointer; text-decoration: underline; padding: 0; }
+.mt-8 { margin-top: 8px; }
 </style>
