@@ -48,7 +48,7 @@ const menuOpen = ref(false)
 </script>
 
 <style scoped>
-/* стили остаются без изменений */
+/* стили без изменений */
 .top-header { height: 60px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 24px; position: sticky; top: 0; z-index: 50; }
 .header-left, .header-right { display: flex; align-items: center; gap: 32px; }
 .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.1rem; color: var(--text-main); }
