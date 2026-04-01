@@ -8,6 +8,7 @@ import ServersTab from '../views/tabs/ServersTab.vue'
 import ModeratorTickets from '../views/ModeratorTickets.vue'
 import ModeratorRoles from '../views/ModeratorRoles.vue'
 import TicketDetail from '../views/TicketDetail.vue'
+import TicketHistory from '../views/TicketHistory.vue'
 
 const routes = [
     { path: '/', redirect: '/projects' },
@@ -26,7 +27,8 @@ const routes = [
     },
     { path: '/moderator/tickets', component: ModeratorTickets },
     { path: '/moderator/tickets/:id', component: TicketDetail },
-    { path: '/moderator/roles', component: ModeratorRoles }
+    { path: '/moderator/roles', component: ModeratorRoles },
+    { path: '/moderator/history', component: TicketHistory },
 ]
 
 export default createRouter({

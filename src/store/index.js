@@ -15,6 +15,33 @@ export const showToast = (message, type = 'success') => {
     setTimeout(() => { toast.show = false }, 3000)
 }
 
+// История действий над тикетами
+export const ticketHistory = reactive([
+    {
+        id: 1,
+        ticketId: 2,
+        ticketTitle: 'Проблема с авторизацией через VK',
+        action: 'taken',
+        actor: 'Михаил В.',
+        from: 'new',
+        to: 'in_progress',
+        timestamp: '2026-03-29 09:00'
+    }
+])
+
+const addHistory = (ticketId, ticketTitle, action, actor, from, to) => {
+    ticketHistory.unshift({
+        id: Date.now(),
+        ticketId,
+        ticketTitle,
+        action,
+        actor,
+        from,
+        to,
+        timestamp: new Date().toLocaleString()
+    })
+}
+
 export const tickets = reactive([
     {
         id: 1,
@@ -71,7 +98,9 @@ export const addMessage = (ticketId, text, role) => {
 export const updateTicketStatus = (ticketId, status) => {
     const ticket = tickets.find(t => t.id === ticketId)
     if (ticket) {
+        const from = ticket.status
         ticket.status = status
+        addHistory(ticketId, ticket.title, 'status_change', user.name, from, status)
         showToast(`Статус тикета #${ticketId} изменён`, 'info')
     }
 }
@@ -81,6 +110,16 @@ export const assignTicketToModerator = (ticketId, moderatorName) => {
     if (ticket && ticket.status === 'new') {
         ticket.status = 'in_progress'
         ticket.developerName = moderatorName
+        addHistory(ticketId, ticket.title, 'taken', moderatorName, 'new', 'in_progress')
         showToast(`Тикет #${ticketId} взят в работу`, 'success')
+    }
+}
+
+export const reopenTicket = (ticketId) => {
+    const ticket = tickets.find(t => t.id === ticketId)
+    if (ticket && ticket.status === 'resolved') {
+        ticket.status = 'in_progress'
+        addHistory(ticketId, ticket.title, 'reopened', user.name, 'resolved', 'in_progress')
+        showToast(`Тикет #${ticketId} снова открыт`, 'info')
     }
 }
