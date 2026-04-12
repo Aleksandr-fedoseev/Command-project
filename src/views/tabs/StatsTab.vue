@@ -12,7 +12,6 @@
       </div>
       <div class="stat-card">
         <span class="label">Примерный доход</span>
-        <!-- Знак рубля и сумма -->
         <span class="value">₽ 34 500</span>
       </div>
     </div>
@@ -24,7 +23,7 @@
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .tab-content { padding: 32px; max-width: 1000px; }
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;}
-.stat-card { background: white; padding: 24px; border-radius: 12px; border: 1px solid #E5E7EB; display: flex; flex-direction: column; gap: 8px;}
-.label { color: #6B7280; font-weight: 500; font-size: 0.9rem;}
-.value { font-size: 2rem; font-weight: 800; color: #111827;}
+.stat-card { background: var(--bg-card); padding: 24px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px;}
+.label { color: var(--text-muted); font-weight: 500; font-size: 0.9rem;}
+.value { font-size: 2rem; font-weight: 800; color: var(--text-main);}
 </style>
