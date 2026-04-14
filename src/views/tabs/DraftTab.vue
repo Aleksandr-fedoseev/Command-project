@@ -3,13 +3,47 @@
     <div class="content-header">
       <div class="title-block">
         <h1 style="margin: 0 0 8px 0; font-size: 1.5rem;">Настройка черновика</h1>
-        <span class="status-badge bg-yellow">Заполнение данных</span>
+        <span class="status-badge" :class="moderationStatusClass">{{ moderationStatusText }}</span>
       </div>
       <div class="actions">
         <button class="btn-outline" @click="showToast('Сохранено!', 'success')">Сохранить</button>
-        <button class="btn-primary" @click="showToast('Отправлено модератору!', 'success')"><Rocket class="icon-sm" /> На модерацию</button>
+        <button class="btn-primary" @click="handleSendToModeration" :disabled="isInModeration">
+          <Rocket class="icon-sm" /> {{ isInModeration ? 'На модерации...' : 'На модерацию' }}
+        </button>
       </div>
     </div>
+
+    <!-- Модалка подтверждения (use-case: SEND) -->
+    <transition name="modal-fade">
+      <div v-if="showConfirmModal" class="modal-overlay" @click.self="showConfirmModal = false">
+        <div class="modal-card">
+          <div class="modal-icon">📤</div>
+          <h2 class="modal-title">Отправить на модерацию?</h2>
+          <p class="modal-desc">
+            Проект будет заблокирован до проверки модератором.
+            Вы не сможете вносить изменения, пока тикет не будет рассмотрен.
+          </p>
+          <div class="modal-checklist">
+            <div class="check-item" :class="{ done: formComplete }">
+              <span class="check-icon">{{ formComplete ? '✓' : '○' }}</span>
+              <span>Метаданные заполнены</span>
+            </div>
+            <div class="check-item" :class="{ done: mediaUploaded }">
+              <span class="check-icon">{{ mediaUploaded ? '✓' : '○' }}</span>
+              <span>Промо-материалы загружены</span>
+            </div>
+            <div class="check-item" :class="{ done: buildReady }">
+              <span class="check-icon">{{ buildReady ? '✓' : '○' }}</span>
+              <span>Билд загружен</span>
+            </div>
+          </div>
+          <div class="modal-actions-row">
+            <button class="btn-modal-cancel" @click="showConfirmModal = false">Отменить</button>
+            <button class="btn-modal-send" @click="confirmSendToModeration">Отправить</button>
+          </div>
+        </div>
+      </div>
+    </transition>
 
     <div class="form-grid">
       <!-- БЛОК 1: МЕТАДАННЫЕ -->
@@ -149,9 +183,40 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Rocket, Image as ImageIcon, Film, MonitorPlay, UploadCloud, Github, CheckCircle } from 'lucide-vue-next'
-import { showToast } from '../../store'
+import { showToast, submitForModeration, MODERATION_STATUS_TEXT, MODERATION_STATUS_COLOR } from '../../store'
+
+// Moderation state
+const moderationStatus = ref('draft') // draft, in_review, approved, rejected
+const showConfirmModal = ref(false)
+
+const isInModeration = computed(() => moderationStatus.value === 'in_review')
+
+const moderationStatusText = computed(() => {
+  return MODERATION_STATUS_TEXT[moderationStatus.value] || 'Черновик'
+})
+
+const moderationStatusClass = computed(() => {
+  const color = MODERATION_STATUS_COLOR[moderationStatus.value] || 'gray'
+  return `bg-${color}`
+})
+
+const formComplete = ref(true)
+const mediaUploaded = computed(() => media.value.icon && media.value.coverMain)
+const buildReady = computed(() => buildStatus.value === 'done')
+
+const handleSendToModeration = () => {
+  if (isInModeration.value) return
+  showConfirmModal.value = true
+}
+
+const confirmSendToModeration = () => {
+  submitForModeration(1) // projectId = 1 для мока
+  moderationStatus.value = 'in_review'
+  showConfirmModal.value = false
+  showToast('Проект отправлен на модерацию', 'success')
+}
 
 const buildMethod = ref('upload')
 
@@ -250,4 +315,34 @@ const handleZipUpload = (event) => {
 .upload-success-box { display: flex; align-items: center; gap: 16px; border-color: var(--success); background: var(--success-light); }
 .btn-text { background: none; border: none; color: var(--primary); font-weight: 600; cursor: pointer; text-decoration: underline; padding: 0; }
 .mt-8 { margin-top: 8px; }
+
+/* ═══════════════════════════════════════════
+   MODERATION STATUS BADGES
+   ═══════════════════════════════════════════ */
+.bg-gray { background: var(--bg-secondary); color: var(--text-muted); border: 1px solid var(--border); }
+.bg-yellow { background: var(--warning-light); color: var(--warning); }
+.bg-green { background: var(--success-light); color: var(--success); }
+.bg-red { background: var(--danger-light); color: var(--danger); }
+
+/* ═══════════════════════════════════════════
+   SEND TO MODERATION MODAL
+   ═══════════════════════════════════════════ */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+.modal-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px 28px; width: 400px; max-width: 90vw; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.modal-icon { font-size: 2.5rem; margin-bottom: 4px; }
+.modal-title { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--text-main); text-align: center; }
+.modal-desc { margin: 0; font-size: 0.88rem; color: var(--text-muted); text-align: center; line-height: 1.5; }
+.modal-checklist { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 16px 0; border-top: 1px solid var(--border); }
+.check-item { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--text-muted); padding: 6px 0; }
+.check-item.done { color: var(--success); font-weight: 600; }
+.check-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid var(--border); font-size: 0.7rem; }
+.check-item.done .check-icon { background: var(--success); border-color: var(--success); color: white; }
+.modal-actions-row { display: flex; gap: 12px; width: 100%; }
+.btn-modal-cancel, .btn-modal-send { flex: 1; padding: 11px; border-radius: var(--radius-md); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s; border: none; }
+.btn-modal-cancel { background: var(--bg-app); color: var(--text-main); border: 1px solid var(--border); }
+.btn-modal-cancel:hover { background: var(--bg-hover); }
+.btn-modal-send { background: var(--primary); color: white; }
+.btn-modal-send:hover { background: var(--primary-hover); }
+.modal-fade-enter-active, .modal-fade-leave-active { transition: opacity 0.2s, transform 0.2s; }
+.modal-fade-enter-from, .modal-fade-leave-to { opacity: 0; transform: scale(0.95); }
 </style>
