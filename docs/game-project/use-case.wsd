@@ -1,0 +1,34 @@
+@startuml PM_UseCase
+title Подсистема управления проектами: Use-Case диаграмма
+
+left to right direction
+
+actor "Разработчик" as dev
+
+usecase "Создать черновик игры" as UC1
+usecase "Загрузить билд клиентской части" as UC2
+usecase "Заполнить метаданные игры" as UC3
+usecase "Управлять доступом к проекту" as UC4
+usecase "Просмотреть список проектов" as UC5  
+usecase "Валидировать файл билда" as UC2_1
+usecase "Заполнить описание и SEO" as UC3_1
+usecase "Загрузить медиа-файлы" as UC3_2
+usecase "Пригласить участника" as UC4_1
+usecase "Изменить права участника" as UC4_2
+usecase "Отобразить статусы проектов" as UC5_1
+
+dev --> UC1
+dev --> UC2
+dev --> UC3
+dev --> UC4
+dev --> UC5
+
+UC2 ..> UC2_1 : <<include>>
+UC3 ..> UC3_1 : <<include>>
+UC3 ..> UC3_2 : <<include>>
+UC4 ..> UC4_1 : <<include>>
+UC4 ..> UC4_2 : <<include>>
+UC5 ..> UC5_1 : <<include>>
+
+
+@enduml

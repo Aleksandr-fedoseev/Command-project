@@ -9,7 +9,18 @@
         <h1>Настройки</h1>
       </div>
 
-      <div class="settings-content">
+      <!-- Табы навигации -->
+      <div class="tabs-nav">
+        <button :class="{ active: activeTab === 'general' }" @click="activeTab = 'general'">
+          <Settings2 class="icon-sm" /> Общие
+        </button>
+        <button :class="{ active: activeTab === 'account' }" @click="activeTab = 'account'">
+          <User class="icon-sm" /> Аккаунт
+        </button>
+      </div>
+
+      <!-- ОБЩИЕ НАСТРОЙКИ -->
+      <div class="settings-content" v-if="activeTab === 'general'">
         <!-- Секция: Язык интерфейса -->
         <section class="settings-section">
           <h2 class="section-title">Язык интерфейса</h2>
@@ -124,14 +135,32 @@
           </div>
         </section>
       </div>
+
+      <!-- АККАУНТ -->
+      <div class="settings-content" v-if="activeTab === 'account'">
+        <!-- Секция: Dev-среда -->
+        <section class="settings-section">
+          <h2 class="section-title">Dev-среда</h2>
+          <p class="section-desc">Данные для входа в тестовую среду. Эти данные используются во всех проектах.</p>
+          <div class="dev-env-box">
+            <div class="dev-header"><MonitorPlay class="icon-sm text-primary" /> <strong>Dev-среда</strong></div>
+            <p class="text-sm text-muted mb-16">Используйте эти данные для входа в игру:</p>
+            <div class="credentials-row">
+              <div class="cred-item"><span class="text-muted">Логин:</span> <code class="code-val">welwise</code></div>
+              <div class="cred-item"><span class="text-muted">Пароль:</span> <code class="code-val">1txqmYkZ-R</code></div>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
-import { ArrowLeft, Sun, Moon, MapPin } from 'lucide-vue-next'
+import { ArrowLeft, Sun, Moon, MapPin, Settings2, User, MonitorPlay } from 'lucide-vue-next'
 
+const activeTab = ref('general')
 const selectedLang = ref('ru')
 const theme = ref('light')
 const location = ref('moscow')
@@ -187,6 +216,39 @@ watch(theme, (newTheme) => {
   font-weight: 700;
   color: var(--text-main);
   margin: 0;
+}
+
+/* Табы навигации */
+.tabs-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.tabs-nav button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tabs-nav button:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+}
+
+.tabs-nav button.active {
+  background: var(--bg-secondary);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .settings-content {
@@ -465,6 +527,19 @@ watch(theme, (newTheme) => {
   background: var(--warning-light);
   color: var(--warning);
 }
+
+/* Dev-среда */
+.dev-env-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
+.dev-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 1.1rem; }
+.text-primary { color: var(--primary); }
+.text-muted { color: var(--text-muted); }
+.text-sm { font-size: 0.85rem; }
+.mb-16 { margin-bottom: 16px; margin-top: 0; }
+.section-desc { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 16px 0; }
+
+.credentials-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.cred-item { background: var(--bg-card); border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;}
+.code-val { font-family: monospace; font-weight: 600; color: var(--text-main); background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; letter-spacing: 0.5px;}
 
 /* Адаптивность */
 @media (max-width: 640px) {

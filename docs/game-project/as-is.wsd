@@ -1,0 +1,46 @@
+@startuml PM_AsIs_Final
+title Подсистема управления проектами: AS-IS
+skinparam sequenceMessageAlign center
+autonumber
+
+actor "Разработчик" as dev
+participant "Telegram" as msg
+participant "Тех. специалист" as tech
+participant "GitHub" as git
+participant "Окружения" as env
+
+== 1. Создание проекта ==
+dev -> msg: Запрос: создать проект
+msg -> tech: Передача задачи
+tech -> git: Ручное создание репозитория
+git --> tech: Ссылка на репозиторий
+tech --> msg: Готово
+msg --> dev: Уведомление
+
+== 2. Загрузка билда ==
+dev -> git: Загрузка билда через git push
+git -> env: Автоматическое развёртывание
+git --> dev: Уведомление о завершении
+
+== 3. Метаданные ==
+dev -> msg: Добавить описание и медиа
+msg -> tech: Передача данных
+tech -> git: Ручное обновление
+tech --> msg: Подтверждение
+msg --> dev: Готово
+
+== 4. Управление доступом ==
+dev -> msg: Добавить участника в проект
+msg -> tech: Запрос на изменение прав
+tech -> git: Ручное обновление прав
+tech --> msg: Готово
+msg --> dev: Уведомление
+
+== 5. Просмотр проектов ==
+dev -> msg: Какой статус проекта?
+msg -> tech: Запрос информации
+tech -> env: Проверка статуса
+tech --> msg: Текстовый ответ
+msg --> dev: Информация
+
+@enduml
